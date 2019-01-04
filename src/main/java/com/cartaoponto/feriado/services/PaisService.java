@@ -1,8 +1,12 @@
 package com.cartaoponto.feriado.services;
 
-import com.cartaoponto.feriado.entities.Pais;
+import com.cartaoponto.feriado.dto.PaisDTO;
+
+import com.cartaoponto.feriado.entities.PaisEntity;
+import com.cartaoponto.feriado.exceptions.InvalidInputDataException;
 import com.cartaoponto.feriado.exceptions.NotFoundException;
 import com.cartaoponto.feriado.repositories.PaisRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,23 +16,38 @@ public class PaisService {
     @Autowired
     private PaisRepository repository;
 
-    public void salvarPais(Pais pais) {
-        if ((pais.getId() != null) && (consultarPais(pais) == null)) {
-            throw new NotFoundException("Não existe um país salvo com o código: " + pais.getId());
+    public PaisService(PaisRepository repository) {
+        this.repository = repository;
+    }
+
+    public PaisDTO salvarPais(PaisDTO paisDTO) {
+        if ((paisDTO.getId() != null) && (consultarPais(paisDTO) == null)) {
+            throw new NotFoundException("Não existe um país salvo com o código: " + paisDTO.getId());
         }
-        this.repository.save(pais);
+        ObjectMapper om = new ObjectMapper();
+        PaisEntity paisEntity = om.convertValue(paisDTO, PaisEntity.class);
+        PaisEntity result =  this.repository.save(paisEntity);
+        paisDTO.setId(result.getId());
+        return paisDTO;
     }
 
-    public void removerPais(Pais pais) {
-        this.repository.delete(pais);
+    public void removerPais(PaisDTO paisDTO) {
+        if (paisDTO.getId() == null){
+            throw new InvalidInputDataException("Não é possível remover um país com ID nulo.");
+        }
+        ObjectMapper om = new ObjectMapper();
+        PaisEntity paisEntity = om.convertValue(paisDTO, PaisEntity.class);
+        this.repository.delete(paisEntity);
     }
 
-    public void consultarPaises() {
-        this.repository.findAll();
+    public PaisDTO consultarPais(PaisDTO paisDTO) {
+        if (paisDTO.getId() == null){
+            throw new NotFoundException("Não existe um país salvo com o código: " + paisDTO.getId());
+        }
+        ObjectMapper om = new ObjectMapper();
+        PaisEntity paisEntity = om.convertValue(paisDTO, PaisEntity.class);
+        PaisEntity result = this.repository.findOne(paisEntity.getId());
+        paisDTO.setId(result.getId());
+        return paisDTO;
     }
-
-    public Pais consultarPais(Pais pais) {
-        return this.repository.findOne(pais.getId());
-    }
-
 }

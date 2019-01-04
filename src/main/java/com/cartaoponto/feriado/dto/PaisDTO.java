@@ -1,17 +1,14 @@
-package com.cartaoponto.feriado.entities;
+package com.cartaoponto.feriado.dto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+public class PaisDTO {
 
-@Entity
-public class Pais {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String descricao;
+
+    public PaisDTO(Long id, String descricao) {
+        this.id = id;
+        this.descricao = descricao;
+    }
 
     public Long getId() {
         return id;
