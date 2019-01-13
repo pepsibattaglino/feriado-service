@@ -13,6 +13,9 @@ public class PaisEntity {
     private Long id;
     private String descricao;
 
+    public PaisEntity() {
+    }
+
     public PaisEntity(Long id, String descricao) {
         this.id = id;
         this.descricao = descricao;
